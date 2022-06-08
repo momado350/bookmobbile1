@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+
+  <meta charset="UTF-8">
+  
+<link rel="apple-touch-icon" type="image/png" href="https://cpwebassets.codepen.io/assets/favicon/apple-touch-icon-5ae1a0698dcc2402e9712f7d01ed509a57814f994c660df9f7a952f3060705ee.png" />
+<meta name="apple-mobile-web-app-title" content="CodePen">
+
+<link rel="shortcut icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/favicon-aec34940fbc1a6e787974dcd360f2c6b63348d4b1f4e06c77743096d55480f33.ico" />
+
+<link rel="mask-icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-8f3771b1072e3c38bd662872f6b673a722f4b3ca2421637d5596661b4e2132cc.svg" color="#111" />
+
+
+  <title>bookmobile with Diffrent Layers</title>
+  
+  
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css'>
+  
+<style>
+body {
+  padding: 0;
+  margin: 0;
+}
+html,
+body,
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+.legend {
+  text-align: left;
+  line-height: 18px;
+  color: #555;
+}
+
+.legend i {
+  width: 17px;
+  height: 17px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.9;
+}
+
+.popinfo {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.popinfo h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+.poplegend {
+  text-align: left;
+  line-height: 18px;
+  color: #555;
+}
+
+.poplegend i {
+  width: 17px;
+  height: 17px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.9;
+}
+
+.incinfo {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.incinfo h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+
+.inclegend {
+  text-align: left;
+  line-height: 18px;
+  color: #555;
+}
+
+.inclegend i {
+  width: 17px;
+  height: 17px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.9;
+}
+</style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+  
+  
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+
+</head>
+
+<body translate="no" >
+  <div id="map"></div>
+    <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-1b93190375e9ccc259df3a57c1abc0e64599724ae30d7ea4c6877eb615f89387.js"></script>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+      <script id="rendered-js" >
+// check https://leaflet-extras.github.io/leaflet-providers/preview/ for free basemap layers
+
+//-----------------------------------------------
+//DISPLAYS BASEMAPS
+//CENTERS THE MAP
+//-----------------------------------------------
+
+var WorldImagery = L.tileLayer(
+"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+{
+  attribution:
+  "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community" });
+
+
+
+var GrayCanvasMap = L.tileLayer(
+"https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.{ext}",
+{
+  attribution:
+  'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  subdomains: "abcd",
+  minZoom: 0,
+  maxZoom: 20,
+  ext: "png" });
+
+
+
+var TopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
+  maxZoom: 17,
+  attribution:
+  'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)' });
+
+
+var map = L.map("map", {
+  center: [39.070301, -94.553131], //California
+  zoom: 12,
+  layers: [WorldImagery, GrayCanvasMap, TopoMap] });
+
+
+//-----------------------------------------------
+//BASEMAP LAYER SELECTION MENU
+//-----------------------------------------------
+
+var baseMaps = {
+  "Gray Canvas Map": GrayCanvasMap,
+  "Topographic Map": TopoMap,
+  "World Imagery": WorldImagery };
+
+L.control.layers(baseMaps).addTo(map);
+
+//-----------------------------------------------
+//ADD FUEL STATION POINT DATA
+//-----------------------------------------------
+
+//var query =
+//"https://rjankows88.carto.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM public.ca_ev_fuel_stations";
+//console.log("Fuel Station Query: " + query);
+
+//MarkerClusterGroup that collects all GeoJSON point objects
+var group = new L.markerClusterGroup().addTo(map);
+//styles
+var geojsonMarkerOptions = {
+  radius: 8,
+  fillColor: "#3366ff",
+  color: "#000",
+  weight: 0.5,
+  opacity: 1,
+  fillOpacity: 1 };
+
+
+//-----------------------------------------------
+//TURN CARTO QUERY INTO GEOJSON DATA
+//ADD POPUP WITH INFO TO EACH FUEL STATION POINT
+//add the fuel station data by invoking the geojsonlayer variable
+//-----------------------------------------------
+
+var geojsonlayer;
+$.getJSON(query, function (fuelstations) {
+  geojsonlayer = L.geoJson(fuelstations, {
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(
+      "<h3> Station name: " +
+      feature.properties.Name +
+      "</h3>" 
+      // "<h4> City: " +
+      // feature.properties.city +
+      // "</h4>" +
+      // "<h4> Facility Type: " +
+      // feature.properties.facility_type +
+      // "</h4>" +
+      // "<h4> EV Connector Type: " +
+      // feature.properties.ev_connector_types +
+      // "</h4>" +
+      // "<h4> Access Type: " +
+      // feature.properties.groups_with_access_code +
+      // "</h4>" +
+      // "<h4> Access Day/Time: " +
+      // feature.properties.access_days_time +
+      // "</h4>"
+      );
+
+    },
+    //style the point marker
+    pointToLayer: function (feature, latlng) {
+      return L.marker(latlng, geojsonMarkerOptions);
+    } });
+
+
+  geojsonlayer.addTo(group);
+
+  map.fitBounds(group.getBounds()); // zooms to fit data
+});
+
+//----------------------------------
+// EV COUNT CHOROPLETH LEGEND - lower right corner
+//----------------------------------
+
+var legend = L.control({
+  position: "bottomright" });
+
+
+legend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "info legend"),
+  grades = [1, 50, 100, 200, 300, 400, 500, 600, 700],
+  labels = [],
+  from,
+  to;
+  // loop through "grades" and create respective entries - colored box + range
+  for (var i = 0; i < grades.length; i++) {if (window.CP.shouldStopExecution(0)) break;
+    from = grades[i];
+    to = grades[i + 1];
+
+    labels.push(
+    //cf. .legend i style in css - 17x17 box
+    '<i style="background:' +
+    getColor(from + 1) +
+    '"></i> ' +
+    from + (
+    to ? "&ndash;" + to : "+") // catching the last case, i.e., i+1 is not defined anymore
+    // condition ? exprIfTrue : exprIfFalse
+    );
+  }
+  //debugger;
+  window.CP.exitedLoop(0);div.innerHTML = labels.join("<br>");
+  return div;
+};
+
+//legend.addTo(map);
+
+//-----------------------------------------------
+// INFO CONTROL FOR EV COUNT POPUP ON MOUSE HOVER - lower left corner
+//-----------------------------------------------
+
+var info = L.control({
+  position: "bottomleft" });
+
+
+info.onAdd = function (map) {
+  this._div = L.DomUtil.create("div", "info");
+  this.update();
+  return this._div;
+};
+
+info.update = function (vehicles) {
+  this._div.innerHTML =
+  "<h4>Population 16+, Unemployed</h4>" + (
+  vehicles ?
+  "<b>" +
+  vehicles.Name +
+  "</b><br>" +
+  vehicles['Civilia 16+, Unem'] +
+  " Unemployed People" :
+  "Hover over an area");
+  // condition ? exprIfTrue : exprIfFalse
+};
+
+//info.addTo(map);
+
+//-----------------------------------------------
+// FUNCTIONS FOR HANDLING THE POPUPS AND
+// THE STYLING OF THE COUNTY POLYGONS - EV COUNT
+//-----------------------------------------------
+
+// Create chorolpleth map and get associated color depending on EV count value
+function getColor(d) {
+  return d > 700 ?
+  "#004529" :
+  d > 600 ?
+  "#006837" :
+  d > 500 ?
+  "#238443" :
+  d > 400 ?
+  "#41ab5d" :
+  d > 300 ?
+  "#78c679" :
+  d > 200 ?
+  "#addd8e" :
+  d > 100 ?
+  "#d9f0a3" :
+  d >50 ?
+  "#f1fcb9" :
+  "#e5e5ce";
+}
+
+function style(feature) {
+  return {
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+    fillColor: getColor(feature.properties['Civilia 16+, Unem']) };
+
+}
+
+//-----------------------------------------------
+// GRAY OUTLINE MOUSE HOVER FUNCTIONALITY
+//-----------------------------------------------
+
+function highlightFeature(e) {
+  var layer = e.target;
+
+  layer.setStyle({
+    weight: 4,
+    color: "#666",
+    dashArray: "",
+    fillOpacity: 0.7 });
+
+
+  if (!L.Browser.ie && !L.Browser.opera) {
+    layer.bringToFront();
+  }
+  info.update(layer.feature.properties);
+}
+
+function resetHighlight(e) {
+  geojson.resetStyle(e.target);
+  info.update();
+}
+
+function zoomToFeature(e) {
+  map.fitBounds(e.target.getBounds());
+}
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    //addEventListeners
+    mouseover: highlightFeature, // mouse moves over shape
+    mouseout: resetHighlight, // mouse leaves shape
+    click: zoomToFeature // click on shape and map will zoom
+  });
+}
+
+var geojson;
+
+var counties =
+"https://raw.githubusercontent.com/momado350/Service-Area-Map/main/bookmobile.geojson";
+console.log("County Query: " + counties);
+
+$.getJSON(counties, function (cartodbdata2) {
+  geojson = L.geoJson(cartodbdata2, {
+    // add popup with info to each geosjon feature
+    style: style, //style polygons
+    onEachFeature: onEachFeature //attached popup behavior
+    // }).addTo(map);
+  });
+  map.fitBounds(geojson.getBounds()); // zooms to fit data
+});
+
+//----------------------------------
+// POPULATION CHOROPLETH LEGEND - lower right corner
+//----------------------------------
+
+var poplegend = L.control({
+  position: "bottomright" });
+
+
+poplegend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "info legend"),
+  grades = [
+  100,
+  500,
+  1000,
+  2000,
+  3000,
+  4000,
+  5000,
+  60000,
+  7000],
+
+  poplabels = [],
+  from,
+  to;
+  // loop through "grades" and create respective entries - colored box + range
+  for (var i = 0; i < grades.length; i++) {if (window.CP.shouldStopExecution(1)) break;
+    from = grades[i];
+    to = grades[i + 1];
+
+    poplabels.push(
+    //cf. .legend i style in css - 17x17 box
+    '<i style="background:' +
+    getColorpop(from + 1) +
+    '"></i> ' +
+    from + (
+    to ? "&ndash;" + to : "+") // catching the last case, i.e., i+1 is not defined anymore
+    // condition ? exprIfTrue : exprIfFalse
+    );
+  }
+  //debugger;
+  window.CP.exitedLoop(1);div.innerHTML = poplabels.join("<br>");
+  return div;
+};
+
+//poplegend.addTo(map);
+
+//-----------------------------------------------
+// INFO CONTROL FOR POPULATION POPUP ON MOUSE HOVER - lower left corner
+//-----------------------------------------------
+
+var popinfo = L.control({
+  position: "bottomleft" });
+
+
+popinfo.onAdd = function (map) {
+  this._div = L.DomUtil.create("div", "info");
+  this.update();
+  return this._div;
+};
+
+popinfo.update = function (population) {
+  this._div.innerHTML =
+  "<h4>Daytime population (Age 16+)</h4>" + (
+  population ?
+  "<b>" +
+  population.Name +
+  "</b><br>" +
+  population['Dayti popula (Age 16+)'] +
+  " Daytime people" :
+  "Hover over an area");
+  // condition ? exprIfTrue : exprIfFalse
+};
+
+//popinfo.addTo(map);
+
+//-----------------------------------------------
+// FUNCTIONS FOR HANDLING THE POPUPS AND
+// THE STYLING OF THE COUNTY POLYGONS - POPULATION
+//-----------------------------------------------
+
+// Create chorolpleth map and get associated color depending on population
+function getColorpop(p) {
+  return p > 6000 ?
+  "#023858" :
+  p > 5000 ?
+  "#045a8d" :
+  p > 4000 ?
+  "#0570b0" :
+  p > 3000 ?
+  "#3690c0" :
+  p > 2000 ?
+  "#74a9cf" :
+  p > 1000 ?
+  "#a6bddb" :
+  p > 500 ?
+  "#d0d1e6" :
+  p > 100 ?
+  "#ece7f2" :
+  "#fff7fb";
+}
+
+function style2(feature) {
+  return {
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+    fillColor: getColorpop(feature.properties['Dayti popula (Age 16+)']) };
+
+}
+
+//-----------------------------------------------
+// GRAY OUTLINE MOUSE HOVER FUNCTIONALITY
+//-----------------------------------------------
+
+function highlightFeature2(e) {
+  var layer2 = e.target;
+
+  layer2.setStyle({
+    weight: 4,
+    color: "#666",
+    dashArray: "",
+    fillOpacity: 0.7 });
+
+
+  if (!L.Browser.ie && !L.Browser.opera) {
+    layer2.bringToFront();
+  }
+  popinfo.update(layer2.feature.properties);
+}
+
+function resetHighlight2(e) {
+  geojson2.resetStyle(e.target);
+  popinfo.update();
+}
+
+function zoomToFeature(e) {
+  map.fitBounds(e.target.getBounds());
+}
+
+function onEachFeature2(feature, layer2) {
+  layer2.on({
+    //addEventListeners
+    mouseover: highlightFeature2, // mouse moves over shape
+    mouseout: resetHighlight2, // mouse leaves shape
+    click: zoomToFeature // click on shape and map will zoom
+  });
+}
+
+var geojson2;
+
+var population =
+"https://raw.githubusercontent.com/momado350/Service-Area-Map/main/bookmobile.geojson";
+console.log("Population Query: " + population);
+
+$.getJSON(population, function (cartodbdata3) {
+  geojson2 = L.geoJson(cartodbdata3, {
+    // add popup with info to each geosjon feature
+    style: style2, //style polygons
+    onEachFeature: onEachFeature2 //attached popup behavior
+  });
+  // geojson2.addTo(map);
+
+  map.fitBounds(geojson2.getBounds()); // zooms to fit data
+});
+
+//----------------------------------
+// INCOME CHOROPLETH LEGEND - lower right corner
+//----------------------------------
+
+var inclegend = L.control({
+  position: "bottomright" });
+
+
+inclegend.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "info legend"),
+  grades = [1, 100, 300, 500, 700, 1000, 1100, 1300, 1500],
+  inclabels = [],
+  from,
+  to;
+  // loop through "grades" and create respective entries - colored box + range
+  for (var i = 0; i < grades.length; i++) {if (window.CP.shouldStopExecution(2)) break;
+    from = grades[i];
+    to = grades[i + 1];
+
+    inclabels.push(
+    //cf. .legend i style in css - 17x17 box
+    '<i style="background:' +
+    getColorinc(from + 1) +
+    '"></i> ' +
+    from + (
+    to ? "&ndash;" + to : "+") // catching the last case, i.e., i+1 is not defined anymore
+    // condition ? exprIfTrue : exprIfFalse
+    );
+  }
+  //debugger;
+  window.CP.exitedLoop(2);div.innerHTML = inclabels.join("<br>");
+  return div;
+};
+
+//inclegend.addTo(map);
+
+//-----------------------------------------------
+// INFO CONTROL FOR INCOME POPUP ON MOUSE HOVER - lower left corner
+//-----------------------------------------------
+
+var incinfo = L.control({
+  position: "bottomleft" });
+
+
+incinfo.onAdd = function (map) {
+  this._div = L.DomUtil.create("div", "info");
+  this.update();
+  return this._div;
+};
+
+incinfo.update = function (income) {
+  this._div.innerHTML =
+  "<h4>Retired population (Age 65+) </h4>" + (
+  income ?
+  "<b>" + income.Name + "</b><br>" + income['Retire popula (Age 65+)'] :
+  "Hover over an area");
+  // condition ? exprIfTrue : exprIfFalse
+};
+
+//incinfo.addTo(map);
+
+//-----------------------------------------------
+// FUNCTIONS FOR HANDLING THE POPUPS AND
+// THE STYLING OF THE COUNTY POLYGONS - INCOME
+//-----------------------------------------------
+
+// Create chorolpleth map and get associated color depending on median income
+function getColorinc(m) {
+  return m > 1500 ?
+  "#662506" :
+  m > 1300 ?
+  "#993404" :
+  m > 1100 ?
+  "#cc4c02" :
+  m > 1000 ?
+  "#ec7014" :
+  m > 700 ?
+  "#fe9929" :
+  m > 500 ?
+  "#fec44f" :
+  m > 300 ?
+  "#fee391" :
+  m > 100 ?
+  "#fff7bc" :
+  "#ffffe5";
+}
+
+function style3(feature) {
+  return {
+    weight: 2,
+    opacity: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+    fillColor: getColorinc(feature.properties['Civilia 16+, Unem']) };
+
+}
+
+//-----------------------------------------------
+// GRAY OUTLINE MOUSE HOVER FUNCTIONALITY
+//-----------------------------------------------
+
+function highlightFeature3(e) {
+  var layer3 = e.target;
+
+  layer3.setStyle({
+    weight: 4,
+    color: "#666",
+    dashArray: "",
+    fillOpacity: 0.7 });
+
+
+  if (!L.Browser.ie && !L.Browser.opera) {
+    layer3.bringToFront();
+  }
+  incinfo.update(layer3.feature.properties);
+}
+
+function resetHighlight3(e) {
+  geojson3.resetStyle(e.target);
+  incinfo.update();
+}
+
+function zoomToFeature(e) {
+  map.fitBounds(e.target.getBounds());
+}
+
+function onEachFeature3(feature, layer3) {
+  layer3.on({
+    //addEventListeners
+    mouseover: highlightFeature3, // mouse moves over shape
+    mouseout: resetHighlight3, // mouse leaves shape
+    click: zoomToFeature // click on shape and map will zoom
+  });
+}
+
+var geojson3;
+
+var income =
+"https://raw.githubusercontent.com/momado350/Service-Area-Map/main/bookmobile.geojson";
+console.log("Income Query: " + income);
+
+$.getJSON(income, function (cartodbdata4) {
+  geojson3 = L.geoJson(cartodbdata4, {
+    // add popup with info to each geosjon feature
+    style: style3, //style polygons
+    onEachFeature: onEachFeature3 //attached popup behavior
+  });
+  // geojson3.addTo(map);
+
+  map.fitBounds(geojson3.getBounds()); // zooms to fit data
+});
+
+var evlayer = { legend, info, geojson };
+
+var poplayer = { poplegend, popinfo, geojson2 };
+
+var inclayer = { inclegend, incinfo, geojson3 };
+
+//-----------------------------------------------
+// CONTROL FOR DROPDOWN
+//-----------------------------------------------
+
+var myDropdown = L.Control.extend({
+  options: {
+    position: "topleft" },
+
+  onAdd: function (map) {
+    this._div = L.DomUtil.create("div", "myDropdown");
+    this._div.innerHTML =
+    '<h2 id="title">Select a layer </h2>' +
+    '<select id="selector">' +
+    '<option value="init">Any</option>' +
+    '<option value="evlayer">Population Unemployed (Age 16+)</option>' +
+    '<option value="poplayer">Daytime Population (Age 16+)</option>' +
+    '<option value="inclayer">Retired Population (Age 65+)</option>' +
+    "</select>";
+    L.DomEvent.disableClickPropagation(this._div);
+    return this._div;
+  } });
+
+map.addControl(new myDropdown());
+
+var layer_select = L.DomUtil.get("selector");
+//prevent clicks on the selector from propagating through to the map
+//(otherwise popups will close immediately after opening)
+L.DomEvent.addListener(layer_select, "click", function (e) {
+  L.DomEvent.stopPropagation(e);
+});
+L.DomEvent.addListener(layer_select, "change", change);
+
+//-----------------------------------------------
+// DROPDOWN MENU FUNCTIONALITY
+//-----------------------------------------------
+
+function change(e) {
+  var showEvlayer = false;
+  var showPoplayer = false;
+  var showInclayer = false;
+  var evlayerShown = map.hasLayer(geojson);
+  var poplayerShown = map.hasLayer(geojson2);
+  var inclayerShown = map.hasLayer(geojson3);
+
+  switch ($("select").val()) {
+    case "init":
+      showEvlayer = false;
+      showPoplayer = false;
+      showInclayer = false;
+      break;
+    case "evlayer":
+      showEvlayer = true;
+      break;
+    case "poplayer":
+      showPoplayer = true;
+      break;
+    case "inclayer":
+      showInclayer = true;}
+
+  if (evlayerShown) {
+    if (!showEvlayer) {
+      map.removeLayer(geojson);
+      map.removeControl(legend);
+      map.removeControl(info);
+    }
+  } else if (showEvlayer) {
+    map.addLayer(geojson);
+    map.addControl(legend);
+    map.addControl(info);
+  }
+  if (poplayerShown) {
+    if (!showPoplayer) {
+      map.removeLayer(geojson2);
+      map.removeControl(poplegend);
+      map.removeControl(popinfo);
+    }
+  } else if (showPoplayer) {
+    map.addLayer(geojson2);
+    map.addControl(poplegend);
+    map.addControl(popinfo);
+  }
+  if (inclayerShown) {
+    if (!showInclayer) {
+      map.removeLayer(geojson3);
+      map.removeControl(inclegend);
+      map.removeControl(incinfo);
+    }
+  } else if (showInclayer) {
+    map.addLayer(geojson3);
+    map.addControl(inclegend);
+    map.addControl(incinfo);
+  }
+}
+
+//-----------------------------------------------
+// SEARCH FIELD
+//-----------------------------------------------
+
+var searchquery =
+"https://raw.githubusercontent.com/momado350/Service-Area-Map/main/bookmobile.geojson";
+var search = "64124"; //example of a string value that will be typed into search bar
+var query = searchquery + search + "%25'"; //%25 represents wildcard, tells program how to search the query
+
+query =
+"https://raw.githubusercontent.com/momado350/Service-Area-Map/main/bookmobile.geojson";
+console.log("Initial query: " + query);
+
+$.getJSON(query, function (data) {
+  geojsonlayer2 = L.geoJson(data, {
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(
+      "<h3> Station name: " +
+      feature.properties.Name +
+      "</h3>" 
+      // "<h4> City: " +
+      // feature.properties.city +
+      // "</h4>" +
+      // "<h4> Facility Type: " +
+      // feature.properties.facility_type +
+      // "</h4>" +
+      // "<h4> EV Connector Type: " +
+      // feature.properties.ev_connector_types +
+      // "</h4>" +
+      // "<h4> Access Type: " +
+      // feature.properties.groups_with_access_code +
+      // "</h4>" +
+      // "<h4> Access Day/Time: " +
+      // feature.properties.access_days_time +
+      // "</h4>"
+      );
+
+    } }).
+  addTo(group);
+  map.fitBounds(group.getBounds()); // zooms to fit data
+});
+
+// var mySearchControl = L.Control.extend({
+//   options: {
+//     position: "bottomleft" },
+
+//   onAdd: function () {
+//     this._div = L.DomUtil.create("div", "myControlLabel");
+//     this._div.innerHTML =
+//     '<h1 id="title">Search term</h1>' +
+//     '<input type="text" id="myTextField" value="Enter search term" />' +
+//     '<input type="submit" id="searchBtn" value="Search" onclick="change_tf()"/>';
+//     L.DomEvent.disableClickPropagation(this._div);
+//     return this._div;
+//   } });
+
+
+// map.addControl(new mySearchControl());
+
+// //make return work as button click
+// var textfield = document.getElementById("myTextField");
+// textfield.addEventListener("keyup", function (event) {
+//   event.preventDefault();
+//   if (event.keyCode === 13) {
+//     document.getElementById("searchBtn").click();
+//   }
+// });
+
+// //-----------------------------------------------
+// // FUNCTIONS FOR HANDLING SEARCH FIELD
+// //-----------------------------------------------
+
+// // button functionality - get value from textfield and change layer
+// function change_tf() {
+//   search = document.getElementById("myTextField").value;
+//   if (search.length == 0) {
+//     console.log("Nothing to search for...");
+//     return;
+//   }
+//   // updating the layer means deleting the old one and
+//   // adding a new one
+//   group.removeLayer(geojsonlayer2);
+
+//   query = searchquery + search + "%25'";
+//   console.log("Changed query: " + query);
+
+//   $.getJSON(query, function (data) {
+//     geojsonlayer2 = L.geoJson(data, {
+//       onEachFeature: function (feature, layer) {
+//         // ADD A POPUP WITH SOME INFO
+//         layer.bindPopup(
+//         "<h3> Station name: " +
+//         feature.properties.station_name +
+//         "</h3>" +
+//         "<h4> City: " +
+//         feature.properties.city +
+//         "</h4>" +
+//         "<h4> Facility Type: " +
+//         feature.properties.facility_type +
+//         "</h4>" +
+//         "<h4> EV Connector Type: " +
+//         feature.properties.ev_connector_types +
+//         "</h4>" +
+//         "<h4> Access Type: " +
+//         feature.properties.groups_with_access_code +
+//         "</h4>" +
+//         "<h4> Access Day/Time: " +
+//         feature.properties.access_days_time +
+//         "</h4>");
+
+//       } }).
+//     addTo(group);
+//   });
+
+  // var title = document.getElementById("title");
+  // title.innerHTML = search;
+//}
+//# sourceURL=pen.js
+    </script>
+
+  
+
+</body>
+
+</html>
